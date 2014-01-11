@@ -2,10 +2,12 @@
 package edu.wpi.first.wpilibj.templates;
 
 import edu.wpi.first.wpilibj.SimpleRobot;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.camera.AxisCamera;
 import edu.wpi.first.wpilibj.image.*;
 import edu.wpi.first.wpilibj.image.NIVision.MeasurementType;
+
 
 /**
  * Sample program to use NIVision to find rectangles in the scene that are illuminated
@@ -28,7 +30,7 @@ import edu.wpi.first.wpilibj.image.NIVision.MeasurementType;
  */
 
 public class VisionSampleProject2014 extends SimpleRobot {
-
+    Talon motor_1;
     //Camera constants used for distance calculation
     final int Y_IMAGE_RES = 480;		//X Image resolution in pixels, should be 120, 240 or 480
     final double VIEW_ANGLE = 49;		//Axis M1013
