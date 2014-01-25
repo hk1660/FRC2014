@@ -53,10 +53,24 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+        checkDrive();
+    }
+    
+    private void checkDrive(){
         double x = joystick1.getRawAxis(1);
+        if(x < 0.05 && x > -0.05){
+            x = 0;
+        }
         double y = joystick1.getRawAxis(2);
+        if(y < 0.05 && y > -0.05){
+            y = 0;
+        }
         double rotation = joystick1.getRawAxis(3);
+        if(rotation < 0.05 && rotation > -0.05){
+                rotation = 0;
+        }
         double gyroAngle = 0;
+        
         drive.mecanumDrive_Cartesian(x, y, rotation, gyroAngle);
     }
     
