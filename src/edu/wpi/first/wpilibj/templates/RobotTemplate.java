@@ -35,7 +35,7 @@ public class RobotTemplate extends IterativeRobot {
     Joystick driverStick;
     Talon winch1;
     Talon winch2;
-    Relay collectorRelay;
+    Relay CollectorRelay;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -43,8 +43,8 @@ public class RobotTemplate extends IterativeRobot {
     public void robotInit() {
         driverStick= new Joystick(1);
         operatorStick = new Joystick(2);
-        collectorRelay = new Relay(5, Relay.Direction.kBoth);
-        collectorRelay.set(Relay.Value.kOff);
+        CollectorRelay = new Relay(5, Relay.Direction.kBoth);
+        CollectorRelay.set(Relay.Value.kOff);
         frontleft = new Talon (1);
         frontright = new Talon (2);
         backleft = new Talon (3);
@@ -84,12 +84,12 @@ public class RobotTemplate extends IterativeRobot {
     
     public void collectorIn()
     {
-    collectorRelay.set(Relay.Value.kForward);
+    CollectorRelay.set(Relay.Value.kForward);
     }
     
     public void collectorOut()
     {
-    collectorRelay.set(Relay.Value.kReverse);
+    CollectorRelay.set(Relay.Value.kReverse);
     }
     
     public void winch()
