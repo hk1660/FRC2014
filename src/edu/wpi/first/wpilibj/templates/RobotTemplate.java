@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.templates;
 
-
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -31,17 +31,26 @@ public class RobotTemplate extends IterativeRobot {
     Talon backleft;
     Talon backright;
     RobotDrive drive; 
-    Joystick joystick1;
+    Joystick operatorStick;
+    Joystick driverStick;
+    Talon winch1;
+    Talon winch2;
+    Relay collectorRelay;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
-        joystick1 = new Joystick(1);
+        driverStick= new Joystick(1);
+        operatorStick = new Joystick(2);
+        collectorRelay = new Relay(5, Relay.Direction.kBoth);
+        collectorRelay.set(Relay.Value.kOff);
         frontleft = new Talon (1);
         frontright = new Talon (2);
         backleft = new Talon (3);
         backright = new Talon (4);
+        winch1 = new Talon (5);
+        winch2 = new Talon (6);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
 
     }
@@ -58,10 +67,39 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void teleopPeriodic() {
         checkDrive();
+        if(operatorStick.getRawButton(7))
+        {
+        winch();
+        }
+        
+        if(operatorStick.getRawButton(8))
+        {
+        collectorIn();
+        }
+        if(operatorStick.getRawButton(9))
+        {
+        collectorOut();
+        }
+    }
+    
+    public void collectorIn()
+    {
+    collectorRelay.set(Relay.Value.kForward);
+    }
+    
+    public void collectorOut()
+    {
+    collectorRelay.set(Relay.Value.kReverse);
+    }
+    
+    public void winch()
+    {
+    winch1.set(1.0);
+    winch2.set(1.0);
     }
     
     private void checkDrive(){
-        double x = joystick1.getRawAxis(1);
+        double x = driverStick.getRawAxis(1);
         if(x < 0.1 && x > -0.1){
             x = 0;
         }
@@ -73,7 +111,7 @@ public class RobotTemplate extends IterativeRobot {
             x = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(x,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD);
         }
         
-        double y = joystick1.getRawAxis(2);
+        double y = driverStick.getRawAxis(2);
         if(y < 0.1 && y > -0.1){
             y = 0;
         }
@@ -84,7 +122,7 @@ public class RobotTemplate extends IterativeRobot {
             y = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(y,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD);
         }
         
-        double rotation = joystick1.getRawAxis(3);
+        double rotation = driverStick.getRawAxis(3);
         if(rotation < 0.05 && rotation > -0.05){
                 rotation = 0;
         }
