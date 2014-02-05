@@ -67,35 +67,34 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void teleopPeriodic() {
         checkDrive();
-        if(operatorStick.getRawButton(7))
-        {
-        winch();
-        }
-        
+        checkWinch();
+        checkCollector();
+    }
+    
+    public void checkCollector()
+    {
         if(operatorStick.getRawButton(8))
         {
-        collectorIn();
+            collectorRelay.set(Relay.Value.kForward);
         }
         if(operatorStick.getRawButton(9))
         {
-        collectorOut();
+            collectorRelay.set(Relay.Value.kReverse);
         }
     }
-    
-    public void collectorIn()
+
+    public void checkWinch()
     {
-    collectorRelay.set(Relay.Value.kForward);
-    }
-    
-    public void collectorOut()
-    {
-    collectorRelay.set(Relay.Value.kReverse);
-    }
-    
-    public void winch()
-    {
-    winch1.set(1.0);
-    winch2.set(1.0);
+        if(operatorStick.getRawButton(7))
+        {
+            winch1.set(1.0);
+            winch2.set(1.0);
+        }
+        else
+        {
+            winch1.set(0.0);
+            winch2.set(0.0);
+        }
     }
     
     private void checkDrive(){
