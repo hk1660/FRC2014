@@ -104,10 +104,10 @@ public class RobotTemplate extends IterativeRobot {
         }
 
         if(x > 0){
-            x = (1-STARTINGTHRESHOLD) * MathUtils.pow(x,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD;
+            x = (1-STARTINGTHRESHOLD) * MathUtils.pow(x,2) + STARTINGTHRESHOLD;
         }
         else if(x < 0){
-            x = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(x,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD);
+            x = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(x,2) + STARTINGTHRESHOLD);
         }
         
         double y = driverStick.getRawAxis(2);
@@ -115,10 +115,10 @@ public class RobotTemplate extends IterativeRobot {
             y = 0;
         }
         if(y > 0){
-            y = (1-STARTINGTHRESHOLD) * MathUtils.pow(y,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD;
+            y = (1-STARTINGTHRESHOLD) * MathUtils.pow(y,2) + STARTINGTHRESHOLD;
         }
         else if(y < 0){
-            y = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(y,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD);
+            y = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(y,2) + STARTINGTHRESHOLD);
         }
         
         double rotation = driverStick.getRawAxis(3);
@@ -126,16 +126,13 @@ public class RobotTemplate extends IterativeRobot {
                 rotation = 0;
         }
         if(rotation > 0){
-            rotation = (1-STARTINGTHRESHOLD) * MathUtils.pow(rotation,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD;
+            rotation = (1-STARTINGTHRESHOLD) * MathUtils.pow(rotation,2) + STARTINGTHRESHOLD;
         }
         else if (rotation < 0){
-            rotation = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(rotation,2-STARTINGTHRESHOLD) + STARTINGTHRESHOLD);
+            rotation = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(rotation,2) + STARTINGTHRESHOLD);
         }
         
         double gyroAngle = 0;
-        
-        System.out.println("x:"+x+" y:"+y+" rotation:"+rotation);
-        
         drive.mecanumDrive_Cartesian(x, y, rotation, 0.0);
     }
     
