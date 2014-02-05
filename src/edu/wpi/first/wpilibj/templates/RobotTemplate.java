@@ -36,6 +36,8 @@ public class RobotTemplate extends IterativeRobot {
     Talon winch1;
     Talon winch2;
     Relay collectorRelay;
+    boolean isPS2Joystick = true;
+    
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -121,10 +123,20 @@ public class RobotTemplate extends IterativeRobot {
             y = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(y,2) + STARTINGTHRESHOLD);
         }
         
-        double rotation = driverStick.getRawAxis(3);
-        if(rotation < 0.05 && rotation > -0.05){
-                rotation = 0;
+        double rotation = 0;
+        
+        if(isPS2Joystick)
+        {
+            rotation = operatorStick.getRawAxis(4);
         }
+        else
+        {
+            rotation = driverStick.getRawAxis(3);   
+        }
+        if(rotation < 0.05 && rotation > -0.05){
+                rotation = 0;               
+        }   
+       
         if(rotation > 0){
             rotation = (1-STARTINGTHRESHOLD) * MathUtils.pow(rotation,2) + STARTINGTHRESHOLD;
         }
