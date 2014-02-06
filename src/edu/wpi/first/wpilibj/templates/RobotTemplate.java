@@ -57,14 +57,15 @@ public class RobotTemplate extends IterativeRobot {
         frontright = new Talon (2);
         backleft = new Talon (3);
         backright = new Talon (4);
-        winch1 = new Talon (5);
-        winch2 = new Talon (6);
+        winch1 = new Talon (6);
+        winch2 = new Talon (7);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
         compressor = new Compressor(5,5);
         compressor.start();
         pancakeRelay = new Relay(4);
         pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
+        
     }
 
     /**
