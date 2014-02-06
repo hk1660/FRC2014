@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.Talon;
 
 import com.sun.squawk.util.*;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Timer;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,7 +38,11 @@ public class RobotTemplate extends IterativeRobot {
     Joystick driverStick;
     Talon winch1;
     Talon winch2;
-    Relay collectorRelay;
+    Compressor compressor;
+    Talon collector;
+    Relay pancakeRelay;
+    Timer pancakeTimer;
+    boolean isPancakeTimerOn = false;
     boolean isPS2Joystick = true;
     
     /**
@@ -56,8 +62,9 @@ public class RobotTemplate extends IterativeRobot {
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
         compressor = new Compressor(5,5);
         compressor.start();
-        Pancake = new Relay(4);
-
+        pancakeRelay = new Relay(4);
+        pancakeRelay.setDirection(Relay.Direction.kForward);
+        pancakeTimer = new Timer();
     }
 
     /**
@@ -116,11 +123,22 @@ public class RobotTemplate extends IterativeRobot {
     
     public void checkPancake()
     {
-        if(operatorStick.getRawButton(ROBOT_TASK_PRIORITY))
-        {
-        
-        }
     
+        if(operatorStick.getRawButton(10) && isPancakeTimerOn == false)
+        {
+            pancakeTimer.start();
+            isPancakeTimerOn = true;
+            pancakeRelay.setDirection(Relay.Direction.kReverse);
+            
+        }
+            // after 2 secs
+        if(pancakeTimer.get() >= 2)
+        {
+            pancakeRelay.set(Relay.Value.kForward);        
+            pancakeTimer.stop();
+            pancakeTimer.reset();
+            isPancakeTimerOn = false;
+        }
     }
     
     private void checkDrive(){
