@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 
 import com.sun.squawk.util.*;
+import edu.wpi.first.wpilibj.Compressor;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,7 +36,9 @@ public class RobotTemplate extends IterativeRobot {
     Joystick driverStick;
     Talon winch1;
     Talon winch2;
-    Relay collectorRelay;
+    Talon collector;
+    Compressor compressor;
+    Relay Pancake;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -43,8 +46,7 @@ public class RobotTemplate extends IterativeRobot {
     public void robotInit() {
         driverStick= new Joystick(1);
         operatorStick = new Joystick(2);
-        collectorRelay = new Relay(5, Relay.Direction.kBoth);
-        collectorRelay.set(Relay.Value.kOff);
+        collector = new Talon (5);
         frontleft = new Talon (1);
         frontright = new Talon (2);
         backleft = new Talon (3);
@@ -52,6 +54,9 @@ public class RobotTemplate extends IterativeRobot {
         winch1 = new Talon (5);
         winch2 = new Talon (6);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
+        compressor = new Compressor(5,5);
+        compressor.start();
+        Pancake = new Relay(4);
 
     }
 
@@ -69,18 +74,30 @@ public class RobotTemplate extends IterativeRobot {
         checkDrive();
         checkWinch();
         checkCollector();
+        checkCompressor();
     }
     
     public void checkCollector()
     {
         if(operatorStick.getRawButton(8))
         {
-            collectorRelay.set(Relay.Value.kForward);
+            collector.set(1.0);
         }
+        else
+        {
+            collector.set(0.0);
+        }
+        
         if(operatorStick.getRawButton(9))
         {
-            collectorRelay.set(Relay.Value.kReverse);
+            collector.set(-1.0);
         }
+    }
+    
+    public void checkCompressor()
+    {
+    
+    
     }
 
     public void checkWinch()
@@ -95,6 +112,15 @@ public class RobotTemplate extends IterativeRobot {
             winch1.set(0.0);
             winch2.set(0.0);
         }
+    }
+    
+    public void checkPancake()
+    {
+        if(operatorStick.getRawButton(ROBOT_TASK_PRIORITY))
+        {
+        
+        }
+    
     }
     
     private void checkDrive(){
