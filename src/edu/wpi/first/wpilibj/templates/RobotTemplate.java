@@ -66,7 +66,7 @@ public class RobotTemplate extends IterativeRobot {
         winch1 = new Talon (6);
         winch2 = new Talon (7);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
-        compressor = new Compressor(5,5);
+        compressor = new Compressor(5,1);
         compressor.start();
         pancakeRelay = new Relay(4);
         pancakeRelay.setDirection(Relay.Direction.kForward);
@@ -91,6 +91,7 @@ public class RobotTemplate extends IterativeRobot {
         checkCollector();
         checkCompressor();
         checkAnchor();
+        checkCollectorAngles();
     }
     
     public void checkCollector()
@@ -109,14 +110,27 @@ public class RobotTemplate extends IterativeRobot {
             collector.set(-1.0);
         }
     }
-    public void checkCollectorAngles () {
-    
+    public void checkCollectorAngles () 
+    {
+        if(driverStick.getRawButton(7)) {
+             skydivePistons.setDirection(Relay.Direction.kReverse);
+             
+        }
+        if (driverStick.getRawButton(8)) {
+             skydivePistons.setDirection(Relay.Direction.kForward);
+        }
     
     }
     
     public void checkCompressor()
     {
-    
+        if (driverStick.getRawButton(3)){
+        compressor.start();
+        }
+        if(driverStick.getRawButton(4)){
+        compressor.stop();
+        }
+        
     
     }
     
