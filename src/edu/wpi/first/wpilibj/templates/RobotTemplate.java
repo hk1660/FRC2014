@@ -41,6 +41,8 @@ public class RobotTemplate extends IterativeRobot {
     Compressor compressor;
     Talon collector;
     Relay pancakeRelay;
+    Relay oceanbluePistons;
+    Relay skydivePistons;
     Timer pancakeTimer;
     boolean isPancakeTimerOn = false;
     boolean isPS2Joystick = true;
@@ -65,7 +67,8 @@ public class RobotTemplate extends IterativeRobot {
         pancakeRelay = new Relay(4);
         pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
-        
+        oceanbluePistons = new Relay (2);
+        skydivePistons = new Relay (3);
     }
 
     /**
@@ -83,6 +86,7 @@ public class RobotTemplate extends IterativeRobot {
         checkWinch();
         checkCollector();
         checkCompressor();
+        checkAnchor();
     }
     
     public void checkCollector()
@@ -101,13 +105,27 @@ public class RobotTemplate extends IterativeRobot {
             collector.set(-1.0);
         }
     }
+    public void checkCollectorAngles () {
+    
+    
+    }
     
     public void checkCompressor()
     {
     
     
     }
-
+    
+    public void checkAnchor() 
+    {
+        if(operatorStick.getRawButton(3)){
+        oceanbluePistons.setDirection(Relay.Direction.kForward);
+        }
+        if (operatorStick.getRawButton(2)){
+        oceanbluePistons.setDirection(Relay.Direction.kReverse);
+        }
+    
+    }
     public void checkWinch()
     {
         if(operatorStick.getRawButton(7))
@@ -196,6 +214,5 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void testPeriodic() {
     
-    }
-    
+    }    
 }
