@@ -5,6 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+
+//Make sure to "Commit" code on your local computer with relevant comments
+//At end of session, "Push" code to the remote repository online.
+
 package edu.wpi.first.wpilibj.templates;
 
 import edu.wpi.first.wpilibj.Relay;
