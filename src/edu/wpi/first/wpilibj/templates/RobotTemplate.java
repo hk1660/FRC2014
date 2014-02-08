@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Talon;
 import com.sun.squawk.util.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 
 /**
@@ -50,6 +51,7 @@ public class RobotTemplate extends IterativeRobot {
     Timer pancakeTimer;
     boolean isPancakeTimerOn = false;
     boolean isPS2Joystick = true;
+    DigitalInput dropitlowSensor;
     
     /**
      * This function is run when the robot is first started up and should be
@@ -73,6 +75,8 @@ public class RobotTemplate extends IterativeRobot {
         pancakeTimer = new Timer();
         oceanbluePistons = new Relay (2);
         skydivePistons = new Relay (3);
+        dropitlowSensor = new DigitalInput (4);
+        
     }
 
     /**
@@ -146,7 +150,7 @@ public class RobotTemplate extends IterativeRobot {
     }
     public void checkWinch()
     {
-        if(operatorStick.getRawButton(7))
+        if(operatorStick.getRawButton(7) && dropitlowSensor.get() == false)
         {
             winch1.set(1.0);
             winch2.set(1.0);
