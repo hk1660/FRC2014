@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj.Talon;
 
 import com.sun.squawk.util.*;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
@@ -43,7 +45,7 @@ public class RobotTemplate extends IterativeRobot {
     Relay pancakeRelay;
     Timer pancakeTimer;
     boolean isPancakeTimerOn = false;
-    boolean isPS2Joystick = true;
+    boolean isPS2Joystick = false;
     
     /**
      * This function is run when the robot is first started up and should be
@@ -66,8 +68,11 @@ public class RobotTemplate extends IterativeRobot {
         pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
         
+        isPS2Joystick  = SmartDashboard.getBoolean("usePS2Joystick", false);
+        SmartDashboard.putString("Collector", "disengaged");
+        SmartDashboard.putString("Pancake", "disengaged");
+        SmartDashboard.putString("Winch", "OFF");
     }
-
     /**
      * This function is called periodically during autonomous
      */
@@ -83,17 +88,20 @@ public class RobotTemplate extends IterativeRobot {
         checkWinch();
         checkCollector();
         checkCompressor();
+        checkPancake();
     }
     
     public void checkCollector()
     {
         if(operatorStick.getRawButton(8))
         {
+            SmartDashboard.putString("Collector", "ON");
             collector.set(1.0);
         }
         else
         {
             collector.set(0.0);
+            SmartDashboard.putString("Collector", "OFF");
         }
         
         if(operatorStick.getRawButton(9))
@@ -112,11 +120,13 @@ public class RobotTemplate extends IterativeRobot {
     {
         if(operatorStick.getRawButton(7))
         {
+            SmartDashboard.putString("Winch", "ON");
             winch1.set(1.0);
             winch2.set(1.0);
         }
         else
         {
+            SmartDashboard.putString("Winch", "OFF");
             winch1.set(0.0);
             winch2.set(0.0);
         }
@@ -124,18 +134,18 @@ public class RobotTemplate extends IterativeRobot {
     
     public void checkPancake()
     {
-    
         if(operatorStick.getRawButton(10) && isPancakeTimerOn == false)
         {
             pancakeTimer.start();
             isPancakeTimerOn = true;
+            SmartDashboard.putString("Pancake", "engaged");
             pancakeRelay.setDirection(Relay.Direction.kReverse);
-            
         }
             // after 2 secs
         if(pancakeTimer.get() >= 2)
-        {
-            pancakeRelay.set(Relay.Value.kForward);        
+        {   
+            SmartDashboard.putString("Pancake", "disengaged");
+            pancakeRelay.setDirection(Relay.Direction.kForward);        
             pancakeTimer.stop();
             pancakeTimer.reset();
             isPancakeTimerOn = false;
