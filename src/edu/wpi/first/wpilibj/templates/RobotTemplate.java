@@ -5,6 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+
+//Make sure to "Commit" code on your local computer with relevant comments
+//At end of session, "Push" code to the remote repository online.
+
 package edu.wpi.first.wpilibj.templates;
 
 import edu.wpi.first.wpilibj.Relay;
@@ -43,9 +47,12 @@ public class RobotTemplate extends IterativeRobot {
     Compressor compressor;
     Talon collector;
     Relay pancakeRelay;
+    Relay oceanbluePistons;
+    Relay skydivePistons;
     Timer pancakeTimer;
     boolean isPancakeTimerOn = false;
-    boolean isPS2Joystick = false;
+    boolean isPS2Joystick = true;
+    DigitalInput dropitlowSensor;
     
     /**
      * This function is run when the robot is first started up and should be
@@ -62,11 +69,14 @@ public class RobotTemplate extends IterativeRobot {
         winch1 = new Talon (6);
         winch2 = new Talon (7);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
-        compressor = new Compressor(5,5);
+        compressor = new Compressor(5,1);
         compressor.start();
         pancakeRelay = new Relay(4);
         pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
+        oceanbluePistons = new Relay (2);
+        skydivePistons = new Relay (3);
+        dropitlowSensor = new DigitalInput (4);
         
         isPS2Joystick  = SmartDashboard.getBoolean("usePS2Joystick", false);
         SmartDashboard.putString("Collector", "disengaged");
@@ -88,7 +98,8 @@ public class RobotTemplate extends IterativeRobot {
         checkWinch();
         checkCollector();
         checkCompressor();
-        checkPancake();
+        checkAnchor();
+        checkCollectorAngles();
     }
     
     public void checkCollector()
@@ -109,16 +120,43 @@ public class RobotTemplate extends IterativeRobot {
             collector.set(-1.0);
         }
     }
+    public void checkCollectorAngles () 
+    {
+        if(driverStick.getRawButton(7)) {
+             skydivePistons.setDirection(Relay.Direction.kReverse);
+             
+        }
+        if (driverStick.getRawButton(8)) {
+             skydivePistons.setDirection(Relay.Direction.kForward);
+        }
+    
+    }
     
     public void checkCompressor()
     {
-    
+        if (driverStick.getRawButton(3)){
+        compressor.start();
+        }
+        if(driverStick.getRawButton(4)){
+        compressor.stop();
+        }
+        
     
     }
-
+    
+    public void checkAnchor() 
+    {
+        if(operatorStick.getRawButton(3)){
+        oceanbluePistons.setDirection(Relay.Direction.kForward);
+        }
+        if (operatorStick.getRawButton(2)){
+        oceanbluePistons.setDirection(Relay.Direction.kReverse);
+        }
+    
+    }
     public void checkWinch()
     {
-        if(operatorStick.getRawButton(7))
+        if(operatorStick.getRawButton(7) && dropitlowSensor.get() == false)
         {
             SmartDashboard.putString("Winch", "ON");
             winch1.set(1.0);
@@ -206,6 +244,5 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void testPeriodic() {
     
-    }
-    
+    }    
 }
