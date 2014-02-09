@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Talon;
 
 import com.sun.squawk.util.*;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,8 +52,9 @@ public class RobotTemplate extends IterativeRobot {
     Relay skydivePistons;
     Timer pancakeTimer;
     boolean isPancakeTimerOn = false;
-    boolean isPS2Joystick = true;
+    boolean isPS2Joystick = false;
     DigitalInput dropitlowSensor;
+    
     
     /**
      * This function is run when the robot is first started up and should be
@@ -77,11 +79,17 @@ public class RobotTemplate extends IterativeRobot {
         oceanbluePistons = new Relay (2);
         skydivePistons = new Relay (3);
         dropitlowSensor = new DigitalInput (4);
+        //boolean dropitlowSensor = false;
+        
         
         isPS2Joystick  = SmartDashboard.getBoolean("usePS2Joystick", false);
         SmartDashboard.putString("Collector", "disengaged");
         SmartDashboard.putString("Pancake", "disengaged");
         SmartDashboard.putString("Winch", "OFF");
+        SmartDashboard.putString("Anchor", "UP");
+        SmartDashboard.putString("cArm", "RVRSE");
+        SmartDashboard.putString("Compressor", "ON");
+        
     }
     /**
      * This function is called periodically during autonomous
@@ -100,14 +108,20 @@ public class RobotTemplate extends IterativeRobot {
         checkCompressor();
         checkAnchor();
         checkCollectorAngles();
+        checkPancake();
     }
     
     public void checkCollector()
     {
         if(operatorStick.getRawButton(8))
         {
-            SmartDashboard.putString("Collector", "ON");
+            SmartDashboard.putString("Collector", "FWD");
             collector.set(1.0);
+        }
+        else if(operatorStick.getRawButton(9))
+        {
+            SmartDashboard.putString("Collector", "RVRSE");
+            collector.set(-1.0);
         }
         else
         {
@@ -115,48 +129,50 @@ public class RobotTemplate extends IterativeRobot {
             SmartDashboard.putString("Collector", "OFF");
         }
         
-        if(operatorStick.getRawButton(9))
-        {
-            collector.set(-1.0);
-        }
+        
     }
     public void checkCollectorAngles () 
     {
-        if(driverStick.getRawButton(7)) {
+        if(operatorStick.getRawButton(6)) {
              skydivePistons.setDirection(Relay.Direction.kReverse);
-             
+             SmartDashboard.putString("cArm", "Retracted");
         }
-        if (driverStick.getRawButton(8)) {
+        if (operatorStick.getRawButton(7)) {
              skydivePistons.setDirection(Relay.Direction.kForward);
+             SmartDashboard.putString("cArm", "Extended");
         }
     
     }
     
     public void checkCompressor()
     {
-        if (driverStick.getRawButton(3)){
-        compressor.start();
+        if (driverStick.getRawButton(3))
+        {
+            SmartDashboard.putString("Compressor", "ON");    
+            compressor.start();
         }
-        if(driverStick.getRawButton(4)){
-        compressor.stop();
+        if(driverStick.getRawButton(4))
+        {
+            SmartDashboard.putString("Compressor", "OFF");
+            compressor.stop();
         }
-        
-    
     }
     
     public void checkAnchor() 
     {
-        if(operatorStick.getRawButton(3)){
-        oceanbluePistons.setDirection(Relay.Direction.kForward);
+        if(driverStick.getRawButton(7)){
+            SmartDashboard.putString("Anchor", "DOWN");
+            oceanbluePistons.setDirection(Relay.Direction.kForward);
         }
-        if (operatorStick.getRawButton(2)){
-        oceanbluePistons.setDirection(Relay.Direction.kReverse);
+        if (driverStick.getRawButton(8)){
+            SmartDashboard.putString("Anchor", "UP");
+            oceanbluePistons.setDirection(Relay.Direction.kReverse);
         }
     
     }
     public void checkWinch()
     {
-        if(operatorStick.getRawButton(7) && dropitlowSensor.get() == false)
+        if(operatorStick.getRawButton(11) /*&& dropitlowSensor.get() == false*/)
         {
             SmartDashboard.putString("Winch", "ON");
             winch1.set(1.0);
