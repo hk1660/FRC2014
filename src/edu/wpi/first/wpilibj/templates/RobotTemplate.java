@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.SensorBase;
 
 
 /**
@@ -73,7 +74,7 @@ public class RobotTemplate extends IterativeRobot {
         winch2 = new Talon (7);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
         compressorRelay = new Relay(1, Relay.Direction.kForward);
-        compressorRelay.set(Relay.Value.kOff);
+        //compressorRelay.set(Relay.Value.kOff);
         //compressorRelaySwitchOn();
         //compressor = new Compressor(5,1);
         //compressor.start();
@@ -144,11 +145,11 @@ compressorRelay.set(Relay.Value.kOn);
     public void checkCollectorAngles () 
     {
         if(operatorStick.getRawButton(6)) {
-             skydivePistons.setDirection(Relay.Direction.kReverse);
+             skydivePistons.set(Relay.Value.kReverse);
              SmartDashboard.putString("cArm", "Retracted");
         }
         if (operatorStick.getRawButton(7)) {
-             skydivePistons.setDirection(Relay.Direction.kForward);
+             skydivePistons.set(Relay.Value.kForward);
              SmartDashboard.putString("cArm", "Extended");
         }
     
@@ -159,12 +160,12 @@ compressorRelay.set(Relay.Value.kOn);
         if (driverStick.getRawButton(3))
         {
             SmartDashboard.putString("Compressor", "ON");    
-            compressor.start();
+            compressorRelay.set(Relay.Value.kOn);
         }
         if(driverStick.getRawButton(4))
         {
             SmartDashboard.putString("Compressor", "OFF");
-            compressor.stop();
+            compressorRelay.set(Relay.Value.kOff);
         }
     }
     
@@ -172,11 +173,12 @@ compressorRelay.set(Relay.Value.kOn);
     {
         if(driverStick.getRawButton(7)){
             SmartDashboard.putString("Anchor", "DOWN");
-            oceanbluePistons.setDirection(Relay.Direction.kForward);
+            oceanbluePistons.set(Relay.Value.kForward);
+            
         }
         if (driverStick.getRawButton(8)){
             SmartDashboard.putString("Anchor", "UP");
-            oceanbluePistons.setDirection(Relay.Direction.kReverse);
+            oceanbluePistons.set(Relay.Value.kReverse);
         }
     
     }
@@ -203,13 +205,13 @@ compressorRelay.set(Relay.Value.kOn);
             pancakeTimer.start();
             isPancakeTimerOn = true;
             SmartDashboard.putString("Pancake", "engaged");
-            pancakeRelay.setDirection(Relay.Direction.kReverse);
+            pancakeRelay.set(Relay.Value.kReverse);
         }
             // after 2 secs
         if(pancakeTimer.get() >= 2)
         {   
             SmartDashboard.putString("Pancake", "disengaged");
-            pancakeRelay.setDirection(Relay.Direction.kForward);        
+            pancakeRelay.set(Relay.Value.kForward);        
             pancakeTimer.stop();
             pancakeTimer.reset();
             isPancakeTimerOn = false;
