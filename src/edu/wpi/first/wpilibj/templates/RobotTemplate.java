@@ -47,6 +47,7 @@ public class RobotTemplate extends IterativeRobot {
     Talon winch2;
     Compressor compressor;
     Talon collector;
+    Relay compressorRelay;
     Relay pancakeRelay;
     Relay oceanbluePistons;
     Relay skydivePistons;
@@ -71,13 +72,16 @@ public class RobotTemplate extends IterativeRobot {
         winch1 = new Talon (6);
         winch2 = new Talon (7);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
-        compressor = new Compressor(5,1);
-        compressor.start();
-        pancakeRelay = new Relay(4);
-        pancakeRelay.setDirection(Relay.Direction.kForward);
+        compressorRelay = new Relay(1, Relay.Direction.kForward);
+        compressorRelay.set(Relay.Value.kOff);
+        //compressorRelaySwitchOn();
+        //compressor = new Compressor(5,1);
+        //compressor.start();
+        pancakeRelay = new Relay(4, Relay.Direction.kBoth);
+        //pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
-        oceanbluePistons = new Relay (2);
-        skydivePistons = new Relay (3);
+        oceanbluePistons = new Relay (2, Relay.Direction.kBoth);
+        skydivePistons = new Relay (3, Relay.Direction.kBoth);
         dropitlowSensor = new DigitalInput (4);
         //boolean dropitlowSensor = false;
         
@@ -131,6 +135,12 @@ public class RobotTemplate extends IterativeRobot {
         
         
     }
+    /*public void compressorRelaySwitchOn() {
+compressorRelay.set(Relay.Value.kOn);
+//System.out.println("Compressor Relay Value Now: " + compressorRelay.get().value);
+
+}
+    */
     public void checkCollectorAngles () 
     {
         if(operatorStick.getRawButton(6)) {
