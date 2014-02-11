@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.SensorBase;
 
 
 
@@ -164,12 +166,12 @@ compressorRelay.set(Relay.Value.kOn);
         if (driverStick.getRawButton(3))
         {
             SmartDashboard.putString("Compressor", "ON");    
-            compressor.start();
+            compressorRelay.set(Relay.Value.kOn);
         }
         if(driverStick.getRawButton(4))
         {
             SmartDashboard.putString("Compressor", "OFF");
-            compressor.stop();
+            compressorRelay.set(Relay.Value.kOff);
         }
     }
     
@@ -291,3 +293,5 @@ compressorRelay.set(Relay.Value.kOn);
     
     }    
 }
+
+
