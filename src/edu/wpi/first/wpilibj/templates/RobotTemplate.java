@@ -20,9 +20,11 @@ import edu.wpi.first.wpilibj.Talon;
 import com.sun.squawk.util.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 
 /**
@@ -55,7 +57,8 @@ public class RobotTemplate extends IterativeRobot {
     boolean isPancakeTimerOn = false;
     boolean isPS2Joystick = false;
     DigitalInput dropitlowSensor;
-    
+    Gyro Gyroscope;
+  
     
     /**
      * This function is run when the robot is first started up and should be
@@ -84,7 +87,7 @@ public class RobotTemplate extends IterativeRobot {
         skydivePistons = new Relay (3, Relay.Direction.kBoth);
         dropitlowSensor = new DigitalInput (4);
         //boolean dropitlowSensor = false;
-        
+        Gyroscope = new Gyro(5);
         
         isPS2Joystick  = SmartDashboard.getBoolean("usePS2Joystick", false);
         SmartDashboard.putString("Collector", "disengaged");
@@ -93,13 +96,14 @@ public class RobotTemplate extends IterativeRobot {
         SmartDashboard.putString("Anchor", "UP");
         SmartDashboard.putString("cArm", "RVRSE");
         SmartDashboard.putString("Compressor", "ON");
-        
+       // SmartDashboard.putString("displayAngle",angle);
+     //   SmartDashboard.putDouble("Angle", angle);
     }
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-
+         double angle = Gyroscope.getAngle();
     }
 
     /**
@@ -113,6 +117,7 @@ public class RobotTemplate extends IterativeRobot {
         checkAnchor();
         checkCollectorAngles();
         checkPancake();
+      //  double displayAngle  =  gyro.getAngle();
     }
     
     public void checkCollector()
@@ -144,11 +149,11 @@ compressorRelay.set(Relay.Value.kOn);
     public void checkCollectorAngles () 
     {
         if(operatorStick.getRawButton(6)) {
-             skydivePistons.setDirection(Relay.Direction.kReverse);
+             skydivePistons.set(Relay.Value.kReverse);
              SmartDashboard.putString("cArm", "Retracted");
         }
         if (operatorStick.getRawButton(7)) {
-             skydivePistons.setDirection(Relay.Direction.kForward);
+             skydivePistons.set(Relay.Value.kForward);
              SmartDashboard.putString("cArm", "Extended");
         }
     
@@ -172,11 +177,11 @@ compressorRelay.set(Relay.Value.kOn);
     {
         if(driverStick.getRawButton(7)){
             SmartDashboard.putString("Anchor", "DOWN");
-            oceanbluePistons.setDirection(Relay.Direction.kForward);
+            oceanbluePistons.set(Relay.Value.kForward);
         }
         if (driverStick.getRawButton(8)){
             SmartDashboard.putString("Anchor", "UP");
-            oceanbluePistons.setDirection(Relay.Direction.kReverse);
+            oceanbluePistons.set(Relay.Value.kReverse);
         }
     
     }
@@ -203,13 +208,13 @@ compressorRelay.set(Relay.Value.kOn);
             pancakeTimer.start();
             isPancakeTimerOn = true;
             SmartDashboard.putString("Pancake", "engaged");
-            pancakeRelay.setDirection(Relay.Direction.kReverse);
+            pancakeRelay.set(Relay.Value.kReverse);
         }
             // after 2 secs
         if(pancakeTimer.get() >= 2)
         {   
             SmartDashboard.putString("Pancake", "disengaged");
-            pancakeRelay.setDirection(Relay.Direction.kForward);        
+            pancakeRelay.set(Relay.Value.kForward);        
             pancakeTimer.stop();
             pancakeTimer.reset();
             isPancakeTimerOn = false;
@@ -217,7 +222,11 @@ compressorRelay.set(Relay.Value.kOn);
     }
     
     private void checkDrive(){
+        
+        ////Set X motion based on Joystick Type
         double x = driverStick.getRawAxis(1);
+        
+        
         if(x < 0.1 && x > -0.1){
             x = 0;
         }
@@ -229,7 +238,13 @@ compressorRelay.set(Relay.Value.kOn);
             x = -1 * ((1-STARTINGTHRESHOLD) * MathUtils.pow(x,2) + STARTINGTHRESHOLD);
         }
         
+
+        //Set Y-motion (STRAFE) based on Joystick Type
         double y = driverStick.getRawAxis(2);
+        
+        
+        
+        
         if(y < 0.1 && y > -0.1){
             y = 0;
         }
@@ -242,6 +257,7 @@ compressorRelay.set(Relay.Value.kOn);
         
         double rotation = 0;
         
+        //Set Rotation Angle based on Joystick Type
         if(isPS2Joystick)
         {
             rotation = operatorStick.getRawAxis(4);
@@ -250,6 +266,9 @@ compressorRelay.set(Relay.Value.kOn);
         {
             rotation = driverStick.getRawAxis(3);   
         }
+        
+        
+        
         if(rotation < 0.05 && rotation > -0.05){
                 rotation = 0;               
         }   
