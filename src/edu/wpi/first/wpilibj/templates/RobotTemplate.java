@@ -1,4 +1,4 @@
-
+ 
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) FIRST 2008. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -78,7 +78,7 @@ public class RobotTemplate extends IterativeRobot {
         winch2 = new Talon (7);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
         compressorRelay = new Relay(1, Relay.Direction.kForward);
-        compressorRelay.set(Relay.Value.kOff);
+        compressorRelay.set(Relay.Value.kOn);
         //compressorRelaySwitchOn();
         //compressor = new Compressor(5,1);
         //compressor.start();
@@ -151,11 +151,11 @@ compressorRelay.set(Relay.Value.kOn);
     public void checkCollectorAngles () 
     {
         if(operatorStick.getRawButton(6)) {
-             skydivePistons.set(Relay.Value.kReverse);
+             skydivePistons.set(Relay.Value.kOff);
              SmartDashboard.putString("cArm", "Retracted");
         }
         if (operatorStick.getRawButton(7)) {
-             skydivePistons.set(Relay.Value.kForward);
+             skydivePistons.set(Relay.Value.kOn);
              SmartDashboard.putString("cArm", "Extended");
         }
     
@@ -179,11 +179,11 @@ compressorRelay.set(Relay.Value.kOn);
     {
         if(driverStick.getRawButton(7)){
             SmartDashboard.putString("Anchor", "DOWN");
-            oceanbluePistons.set(Relay.Value.kForward);
+            oceanbluePistons.set(Relay.Value.kOff);
         }
         if (driverStick.getRawButton(8)){
             SmartDashboard.putString("Anchor", "UP");
-            oceanbluePistons.set(Relay.Value.kReverse);
+            oceanbluePistons.set(Relay.Value.kOn);
         }
     
     }
@@ -210,13 +210,13 @@ compressorRelay.set(Relay.Value.kOn);
             pancakeTimer.start();
             isPancakeTimerOn = true;
             SmartDashboard.putString("Pancake", "engaged");
-            pancakeRelay.set(Relay.Value.kReverse);
+            pancakeRelay.set(Relay.Value.kOn);
         }
             // after 2 secs
         if(pancakeTimer.get() >= 2)
         {   
             SmartDashboard.putString("Pancake", "disengaged");
-            pancakeRelay.set(Relay.Value.kForward);        
+            pancakeRelay.set(Relay.Value.kOff);        
             pancakeTimer.stop();
             pancakeTimer.reset();
             isPancakeTimerOn = false;
