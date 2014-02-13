@@ -37,7 +37,41 @@ import edu.wpi.first.wpilibj.SensorBase;
  * directory.
  */
 public class RobotTemplate extends IterativeRobot {
-
+    
+    /** JOYSTICK BUTTONS **/
+    //DRIVER JOYSTICK
+    final static int ANCHOR_UP_BUTTON = 0;
+    final static int ANCHOR_DOWN_BUTTON = 2;
+    
+    //OPERATOR JOYSTICK
+    final static int PANCAKE_BUTTON = 7;
+    final static int WINCH_BUTTON = 6;
+    final static int COLLECTOR_DOWN_BUTTON = 0;
+    final static int COLLECTOR_UP_BUTTON = 2;
+    final static int COLLECTOR_BUTTON = 1;
+    final static int COLLECTOR_BUTTON_REVERSE = 3;
+    
+    
+    /** CHANNELS **/
+    //PWM CHANNEL
+    final static int FRONT_LEFT_CHANNEL = 1;
+    final static int FRONT_RIGHT_CHANNEL = 2;
+    final static int BACK_LEFT_CHANNEL = 3;
+    final static int BACK_RIGHT_CHANNEL = 4;
+    final static int COLLECTOR_CHANNEL = 5;
+    final static int WINCH_2_CHANNEL = 7;
+    final static int WINCH_1_CHANNEL = 6;
+    
+    //RELAYS
+    final static int ANCHOR_CHANNEL = 4;
+    final static int COLLECTOR_ANGLE_CHANNEL = 2;
+    final static int COMPRESSOR_RELAY_CHANNEL = 1;
+    final static int PANCAKE_CHANNEL = 3;
+    
+    // DIGITAL I/O
+    final static int WINCH_LIMIT_SWITCH_CHANNEL = 4;
+    
+    
     double STARTINGTHRESHOLD = 0.0;
     
     Talon frontleft;
@@ -45,8 +79,9 @@ public class RobotTemplate extends IterativeRobot {
     Talon backleft;
     Talon backright;
     RobotDrive drive; 
-    Joystick operatorStick;
-    Joystick driverStick;
+    Joystick driverOne; 
+    Joystick driverTwo; 
+    Joystick operatorStick; 
     Talon winch1;
     Talon winch2;
     Compressor compressor;
@@ -57,7 +92,7 @@ public class RobotTemplate extends IterativeRobot {
     Relay skydivePistons;
     Timer pancakeTimer;
     boolean isPancakeTimerOn = false;
-    boolean isPS2Joystick = false;
+    boolean isPS3Joystick = true;
     DigitalInput dropitlowSensor;
     Gyro Gyroscope;
   
@@ -67,31 +102,38 @@ public class RobotTemplate extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-        driverStick= new Joystick(1);
-        operatorStick = new Joystick(2);
-        collector = new Talon (5);
-        frontleft = new Talon (1);
-        frontright = new Talon (2);
-        backleft = new Talon (3);
-        backright = new Talon (4);
-        winch1 = new Talon (6);
-        winch2 = new Talon (7);
+        driverOne = new Joystick(1);
+        if(isPS3Joystick == true){
+            operatorStick = new Joystick(2);
+        }
+        else{
+            driverTwo = new Joystick(2);
+            operatorStick = new Joystick(3);
+        }
+        
+        collector = new Talon (COLLECTOR_CHANNEL);
+        frontleft = new Talon (FRONT_LEFT_CHANNEL);
+        frontright = new Talon (FRONT_RIGHT_CHANNEL);
+        backleft = new Talon (BACK_LEFT_CHANNEL);
+        backright = new Talon (BACK_RIGHT_CHANNEL);
+        winch1 = new Talon (WINCH_1_CHANNEL);
+        winch2 = new Talon (WINCH_2_CHANNEL);
         drive = new RobotDrive (frontleft,backleft, frontright,backright);
-        compressorRelay = new Relay(1, Relay.Direction.kForward);
+        compressorRelay = new Relay(COMPRESSOR_RELAY_CHANNEL, Relay.Direction.kForward);
         compressorRelay.set(Relay.Value.kOn);
         //compressorRelaySwitchOn();
         //compressor = new Compressor(5,1);
         //compressor.start();
-        pancakeRelay = new Relay(4, Relay.Direction.kBoth);
+        pancakeRelay = new Relay(PANCAKE_CHANNEL, Relay.Direction.kBoth);
         //pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
-        oceanbluePistons = new Relay (2, Relay.Direction.kBoth);
-        skydivePistons = new Relay (3, Relay.Direction.kBoth);
-        dropitlowSensor = new DigitalInput (4);
+        oceanbluePistons = new Relay (ANCHOR_CHANNEL, Relay.Direction.kBoth);
+        skydivePistons = new Relay (COLLECTOR_ANGLE_CHANNEL, Relay.Direction.kBoth);
+        dropitlowSensor = new DigitalInput (WINCH_LIMIT_SWITCH_CHANNEL);
         //boolean dropitlowSensor = false;
         //Gyroscope = new Gyro(5);
         
-        isPS2Joystick  = SmartDashboard.getBoolean("usePS2Joystick", false);
+        isPS3Joystick  = SmartDashboard.getBoolean("usePS3Joystick", true);
         SmartDashboard.putString("Collector", "disengaged");
         SmartDashboard.putString("Pancake", "disengaged");
         SmartDashboard.putString("Winch", "OFF");
@@ -124,12 +166,12 @@ public class RobotTemplate extends IterativeRobot {
     
     public void checkCollector()
     {
-        if(operatorStick.getRawButton(8))
+        if(operatorStick.getRawButton(COLLECTOR_BUTTON))
         {
             SmartDashboard.putString("Collector", "FWD");
             collector.set(1.0);
         }
-        else if(operatorStick.getRawButton(9))
+        else if(operatorStick.getRawButton(COLLECTOR_BUTTON_REVERSE))
         {
             SmartDashboard.putString("Collector", "RVRSE");
             collector.set(-1.0);
@@ -150,11 +192,11 @@ compressorRelay.set(Relay.Value.kOn);
     */
     public void checkCollectorAngles () 
     {
-        if(operatorStick.getRawButton(6)) {
+        if(operatorStick.getRawButton(COLLECTOR_UP_BUTTON)) {
              skydivePistons.set(Relay.Value.kReverse);
              SmartDashboard.putString("cArm", "Retracted");
         }
-        if (operatorStick.getRawButton(7)) {
+        if (operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON)) {
              skydivePistons.set(Relay.Value.kForward);
              SmartDashboard.putString("cArm", "Extended");
         }
@@ -163,12 +205,12 @@ compressorRelay.set(Relay.Value.kOn);
     
     public void checkCompressor()
     {
-        if (driverStick.getRawButton(3))
+        if (driverOne.getRawButton(6))
         {
             SmartDashboard.putString("Compressor", "ON");    
             compressorRelay.set(Relay.Value.kOn);
         }
-        if(driverStick.getRawButton(4))
+        if(driverOne.getRawButton(4))
         {
             SmartDashboard.putString("Compressor", "OFF");
             compressorRelay.set(Relay.Value.kOff);
@@ -177,11 +219,11 @@ compressorRelay.set(Relay.Value.kOn);
     
     public void checkAnchor() 
     {
-        if(driverStick.getRawButton(7)){
+        if(driverOne.getRawButton(ANCHOR_DOWN_BUTTON)){
             SmartDashboard.putString("Anchor", "DOWN");
             oceanbluePistons.set(Relay.Value.kReverse);
         }
-        if (driverStick.getRawButton(8)){
+        if (driverOne.getRawButton(ANCHOR_UP_BUTTON)){
             SmartDashboard.putString("Anchor", "UP");
             oceanbluePistons.set(Relay.Value.kForward);
         }
@@ -189,7 +231,7 @@ compressorRelay.set(Relay.Value.kOn);
     }
     public void checkWinch()
     {
-        if(operatorStick.getRawButton(11) /*&& dropitlowSensor.get() == false*/)
+        if(operatorStick.getRawButton(WINCH_BUTTON) /*&& dropitlowSensor.get() == false*/)
         {
             SmartDashboard.putString("Winch", "ON");
             winch1.set(1.0);
@@ -205,12 +247,13 @@ compressorRelay.set(Relay.Value.kOn);
     
     public void checkPancake()
     {
-        if(operatorStick.getRawButton(10) && isPancakeTimerOn == false)
+        if(operatorStick.getRawButton(PANCAKE_BUTTON) && isPancakeTimerOn == false)
         {
             pancakeTimer.start();
             isPancakeTimerOn = true;
             SmartDashboard.putString("Pancake", "engaged");
-            pancakeRelay.set(Relay.Value.kForward);
+            pancakeRelay.set(Relay.Value.kReverse);
+            
         }
             // after 2 secs
         if(pancakeTimer.get() >= 2)
@@ -225,10 +268,19 @@ compressorRelay.set(Relay.Value.kOn);
     
     private void checkDrive(){
         
-        ////Set X motion based on Joystick Type
-        double x = driverStick.getRawAxis(1);
+       //Set X motion based on Joystick Type
+        double x = 0; 
         
-        
+        if(isPS3Joystick) 
+        { 
+            x = driverOne.getRawAxis(1); 
+            x = x * -1;
+        }    
+        else 
+        { 
+            x = driverOne.getRawAxis(1); 
+            x = x * -1;
+        }
         if(x < 0.1 && x > -0.1){
             x = 0;
         }
@@ -242,10 +294,17 @@ compressorRelay.set(Relay.Value.kOn);
         
 
         //Set Y-motion (STRAFE) based on Joystick Type
-        double y = driverStick.getRawAxis(2);
+        double y = 0; 
         
-        
-        
+        if(isPS3Joystick) 
+        { 
+            y = driverOne.getRawAxis(2);
+            y = y * -1;
+        } 
+        else 
+        { 
+            y = driverOne.getRawAxis(2);
+        }
         
         if(y < 0.1 && y > -0.1){
             y = 0;
@@ -260,13 +319,15 @@ compressorRelay.set(Relay.Value.kOn);
         double rotation = 0;
         
         //Set Rotation Angle based on Joystick Type
-        if(isPS2Joystick)
+        if(isPS3Joystick)
         {
-            rotation = operatorStick.getRawAxis(4);
+            rotation = driverOne.getRawAxis(3); 
+            rotation = rotation * -1;
         }
         else
         {
-            rotation = driverStick.getRawAxis(3);   
+            rotation = driverTwo.getRawAxis(1); 
+            rotation = rotation * -1;
         }
         
         
