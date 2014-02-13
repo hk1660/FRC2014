@@ -64,9 +64,9 @@ public class RobotTemplate extends IterativeRobot {
     
     //RELAYS
     final static int ANCHOR_CHANNEL = 4;
-    final static int COLLECTOR_ANGLE_CHANNEL = 2;
+    final static int COLLECTOR_ANGLE_CHANNEL = 8;
     final static int COMPRESSOR_RELAY_CHANNEL = 1;
-    final static int PANCAKE_CHANNEL = 3;
+    final static int PANCAKE_CHANNEL = 2;
     
     // DIGITAL I/O
     final static int WINCH_LIMIT_SWITCH_CHANNEL = 4;
