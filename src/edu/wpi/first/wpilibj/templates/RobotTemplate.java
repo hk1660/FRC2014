@@ -89,7 +89,7 @@ public class RobotTemplate extends IterativeRobot {
         skydivePistons = new Relay (3, Relay.Direction.kBoth);
         dropitlowSensor = new DigitalInput (4);
         //boolean dropitlowSensor = false;
-        Gyroscope = new Gyro(5);
+        //Gyroscope = new Gyro(5);
         
         isPS2Joystick  = SmartDashboard.getBoolean("usePS2Joystick", false);
         SmartDashboard.putString("Collector", "disengaged");
@@ -151,11 +151,11 @@ compressorRelay.set(Relay.Value.kOn);
     public void checkCollectorAngles () 
     {
         if(operatorStick.getRawButton(6)) {
-             skydivePistons.set(Relay.Value.kOff);
+             skydivePistons.set(Relay.Value.kReverse);
              SmartDashboard.putString("cArm", "Retracted");
         }
         if (operatorStick.getRawButton(7)) {
-             skydivePistons.set(Relay.Value.kOn);
+             skydivePistons.set(Relay.Value.kForward);
              SmartDashboard.putString("cArm", "Extended");
         }
     
@@ -179,11 +179,11 @@ compressorRelay.set(Relay.Value.kOn);
     {
         if(driverStick.getRawButton(7)){
             SmartDashboard.putString("Anchor", "DOWN");
-            oceanbluePistons.set(Relay.Value.kOff);
+            oceanbluePistons.set(Relay.Value.kReverse);
         }
         if (driverStick.getRawButton(8)){
             SmartDashboard.putString("Anchor", "UP");
-            oceanbluePistons.set(Relay.Value.kOn);
+            oceanbluePistons.set(Relay.Value.kForward);
         }
     
     }
@@ -210,13 +210,13 @@ compressorRelay.set(Relay.Value.kOn);
             pancakeTimer.start();
             isPancakeTimerOn = true;
             SmartDashboard.putString("Pancake", "engaged");
-            pancakeRelay.set(Relay.Value.kOn);
+            pancakeRelay.set(Relay.Value.kForward);
         }
             // after 2 secs
         if(pancakeTimer.get() >= 2)
         {   
             SmartDashboard.putString("Pancake", "disengaged");
-            pancakeRelay.set(Relay.Value.kOff);        
+            pancakeRelay.set(Relay.Value.kReverse);        
             pancakeTimer.stop();
             pancakeTimer.reset();
             isPancakeTimerOn = false;
