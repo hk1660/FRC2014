@@ -150,7 +150,28 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-         double angle = Gyroscope.getAngle();
+        Timer autonomoustimer = new Timer();
+        autonomoustimer.start();
+        double angle = Gyroscope.getAngle();
+        
+        while (isAutonomous() && isEnabled())
+        {
+            if(autonomoustimer.get() > 0 && autonomoustimer.get() < 3)
+            {
+                frontleft.set(1.0);
+                frontright.set(1.0);
+                backleft.set(1.0);
+                backright.set(1.0);
+            }
+            if(autonomoustimer.get() > 3 && autonomoustimer.get() < 4)
+            {
+                pancakeRelay.set(Relay.Value.kReverse);
+            }
+            if(autonomoustimer.get() > 4 && autonomoustimer.get() < 5)
+            {
+                pancakeRelay.set(Relay.Value.kForward);
+            }
+        }
     }
 
     /**
