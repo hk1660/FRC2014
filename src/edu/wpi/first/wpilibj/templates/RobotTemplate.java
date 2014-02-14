@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
-
+import edu.wpi.first.wpilibj.Encoder;
 import com.sun.squawk.util.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -94,6 +94,7 @@ public class RobotTemplate extends IterativeRobot {
     boolean isPancakeTimerOn = false;
     boolean isPS3Joystick = true;
     DigitalInput dropitlowSensor;
+    Encoder Encoder;
     Gyro Gyroscope;
   
     
@@ -130,6 +131,8 @@ public class RobotTemplate extends IterativeRobot {
         oceanbluePistons = new Relay (ANCHOR_CHANNEL, Relay.Direction.kBoth);
         skydivePistons = new Relay (COLLECTOR_ANGLE_CHANNEL, Relay.Direction.kBoth);
         dropitlowSensor = new DigitalInput (WINCH_LIMIT_SWITCH_CHANNEL);
+        Encoder = new Encoder(2,3);
+        int Evalue = Encoder.getRaw();
         //boolean dropitlowSensor = false;
         //Gyroscope = new Gyro(5);
         
@@ -231,6 +234,7 @@ compressorRelay.set(Relay.Value.kOn);
     }
     public void checkWinch()
     {
+        SmartDashboard.putDouble("Encoder", Encoder.getRate());
         if(operatorStick.getRawButton(WINCH_BUTTON) /*&& dropitlowSensor.get() == false*/)
         {
             SmartDashboard.putString("Winch", "ON");
