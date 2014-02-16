@@ -36,16 +36,18 @@ public class RobotTemplate extends IterativeRobot {
      * JOYSTICK BUTTONS *
      */
     //DRIVER JOYSTICK
-    final static int ANCHOR_UP_BUTTON = 0;
-    final static int ANCHOR_DOWN_BUTTON = 2;
+    final static int ANCHOR_UP_BUTTON = 1;  //1 is triangle
+    final static int ANCHOR_DOWN_BUTTON = 3; //3 is x
 
     //OPERATOR JOYSTICK
-    final static int PANCAKE_BUTTON = 7;
-    final static int WINCH_BUTTON = 6;
-    final static int COLLECTOR_DOWN_BUTTON = 0;
-    final static int COLLECTOR_UP_BUTTON = 2;
-    final static int COLLECTOR_BUTTON = 1;
-    final static int COLLECTOR_BUTTON_REVERSE = 3;
+    final static int PANCAKE_BUTTON = 7; //7 = L2 
+    final static int LAUNCH_BUTTON = 8; //8 = R2
+    final static int UNLAUNCH_BUTTON = 9; //9 = SELECT
+    final static int WINCH_BUTTON = 6; //6 is R1
+    final static int COLLECTOR_DOWN_BUTTON = 10; //10 = START
+    final static int COLLECTOR_UP_BUTTON = 2; //2 = CIRCLE
+    final static int COLLECTOR_BUTTON = 1; //1 is triangle
+    final static int COLLECTOR_BUTTON_REVERSE = 3; //3 is x
 
     /**
      * CHANNELS *
@@ -90,6 +92,7 @@ public class RobotTemplate extends IterativeRobot {
     Timer autoTimer; 
     boolean isPancakeTimerOn = false;
     boolean isPS3Joystick = true;
+    boolean isAnchorDown = false;
     DigitalInput dropitlowSensor;
     Encoder encoder;
     Gyro gyroScope;
@@ -129,7 +132,8 @@ public class RobotTemplate extends IterativeRobot {
         encoder = new Encoder(2, 3);
         //int Evalue = Encoder.getRaw();
         boolean dropitlowSensor = false;
-        gyroScope = new Gyro(5);
+        
+        //gyroScope = new Gyro(5);
 
         isPS3Joystick = SmartDashboard.getBoolean("usePS3Joystick", true);
         SmartDashboard.putString("Collector", "disengaged");
@@ -138,6 +142,7 @@ public class RobotTemplate extends IterativeRobot {
         SmartDashboard.putString("Anchor", "UP");
         SmartDashboard.putString("cArm", "RVRSE");
         SmartDashboard.putString("Compressor", "ON");
+        
        // SmartDashboard.putString("displayAngle",angle);
         //   SmartDashboard.putDouble("Angle", angle);
     }
@@ -174,13 +179,13 @@ public class RobotTemplate extends IterativeRobot {
     
     public void disengagePancake()
     {
-    SmartDashboard.putString("Pancake", "disengaged");
-            pancakeRelay.set(Relay.Value.kReverse);
+        SmartDashboard.putString("Pancake", "disengaged");
+        pancakeRelay.set(Relay.Value.kReverse);
     }
     public void engagePancake()
     {
          SmartDashboard.putString("Pancake", "engaged");
-            pancakeRelay.set(Relay.Value.kReverse);
+         pancakeRelay.set(Relay.Value.kForward);
     }
     public void winchDownInAuto(double startTime, double endTime)
     {
@@ -205,6 +210,7 @@ public class RobotTemplate extends IterativeRobot {
         checkAnchor();
         checkCollectorAngles();
         checkPancake();
+        checkLaunch();
         //  double displayAngle  =  gyro.getAngle();
     }
 
@@ -251,14 +257,18 @@ public class RobotTemplate extends IterativeRobot {
         }
     }
 
+    
     public void checkAnchor() {
         if (driverOne.getRawButton(ANCHOR_DOWN_BUTTON)) {
+            isAnchorDown = true;
             SmartDashboard.putString("Anchor", "DOWN");
             oceanbluePistons.set(Relay.Value.kReverse);
+            
         }
         if (driverOne.getRawButton(ANCHOR_UP_BUTTON)) {
             SmartDashboard.putString("Anchor", "UP");
             oceanbluePistons.set(Relay.Value.kForward);
+            isAnchorDown = false;
         }
 
     }
@@ -296,13 +306,28 @@ public class RobotTemplate extends IterativeRobot {
         }
     }
 
-    public void checkPancake() {
-        if (operatorStick.getRawButton(PANCAKE_BUTTON) && isPancakeTimerOn == false) {
-            pancakeTimer.start();
-            isPancakeTimerOn = true;
-            engagePancake();
-
+    public void checkLaunch()
+    {
+        if (operatorStick.getRawButton(LAUNCH_BUTTON)) {
+            disengagePancake();
         }
+        if (operatorStick.getRawButton(UNLAUNCH_BUTTON)) {
+            engagePancake();
+        }
+    }    
+    
+    
+    
+    public void checkPancake() {
+        if (operatorStick.getRawButton(PANCAKE_BUTTON) ) {  //&& isPancakeTimerOn == false
+           // pancakeTimer.start();
+           // isPancakeTimerOn = true;
+            engagePancake();
+            //SmartDashboard.putNumber("pancakeTimer", pancakeTimer.get());
+            SmartDashboard.putString("Pancake", "engaged");
+        }
+        
+        /*
         // after 2 secs
         if (pancakeTimer.get() >= 2) {
             disengagePancake();
@@ -310,10 +335,14 @@ public class RobotTemplate extends IterativeRobot {
             pancakeTimer.reset();
             isPancakeTimerOn = false;
         }
+        */
     }
 
     private void checkDrive() {
-
+        if(isAnchorDown == true){
+            drive.drive(0.0, 0.0);
+            return;
+        }
         //Set X motion based on Joystick Type
         double x = 0;
 
@@ -324,7 +353,7 @@ public class RobotTemplate extends IterativeRobot {
             x = driverOne.getRawAxis(1);
             x = x * -1;
         }
-        if (x < 0.1 && x > -0.1) {
+        if (x < 0.01 && x > -0.01) {
             x = 0;
         }
 
@@ -344,7 +373,7 @@ public class RobotTemplate extends IterativeRobot {
             y = driverOne.getRawAxis(2);
         }
 
-        if (y < 0.1 && y > -0.1) {
+        if (y < 0.01 && y > -0.01) {
             y = 0;
         }
         if (y > 0) {
@@ -364,7 +393,7 @@ public class RobotTemplate extends IterativeRobot {
             rotation = rotation * -1;
         }
 
-        if (rotation < 0.05 && rotation > -0.05) {
+        if (rotation < 0.01 && rotation > -0.01) {
             rotation = 0;
         }
 
