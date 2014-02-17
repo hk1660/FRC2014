@@ -44,7 +44,8 @@ public class RobotTemplate extends IterativeRobot {
     final static int LAUNCH_BUTTON = 8; //8 = R2
     final static int UNLAUNCH_BUTTON = 9; //9 = SELECT
     final static int WINCH_BUTTON = 6; //6 is R1
-    final static int COLLECTOR_DOWN_BUTTON = 10; //10 = START
+    final static int COLLECTOR_DOWN_BUTTON = 4; //4 = SQUARE
+    final static int COLLECTOR_DOWN_BUTTON2 = 10; //=10 = start
     final static int COLLECTOR_UP_BUTTON = 2; //2 = CIRCLE
     final static int COLLECTOR_BUTTON = 1; //1 is triangle
     final static int COLLECTOR_BUTTON_REVERSE = 3; //3 is x
@@ -69,6 +70,7 @@ public class RobotTemplate extends IterativeRobot {
 
     // DIGITAL I/O
     final static int WINCH_LIMIT_SWITCH_CHANNEL = 4;
+    final static int PRESSURE_SWITCH_CHANNEL = 5; 
 
     double STARTINGTHRESHOLD = 0.0;
 
@@ -92,7 +94,9 @@ public class RobotTemplate extends IterativeRobot {
     Timer autoTimer; 
     boolean isPancakeTimerOn = false;
     boolean isPS3Joystick = true;
-    boolean isAnchorDown = false;
+    boolean isAnchorDown = false; 
+    //boolean isdropBoolean = false; 
+    DigitalInput pushitSensor; 
     DigitalInput dropitlowSensor;
     Encoder encoder;
     Gyro gyroScope;
@@ -110,7 +114,7 @@ public class RobotTemplate extends IterativeRobot {
             operatorStick = new Joystick(3);
         }
 
-        collector = new Talon(COLLECTOR_CHANNEL);
+        collector = new Talon(CHANNEL);
         frontleft = new Talon(FRONT_LEFT_CHANNEL);
         frontright = new Talon(FRONT_RIGHT_CHANNEL);
         backleft = new Talon(BACK_LEFT_CHANNEL);
@@ -129,10 +133,10 @@ public class RobotTemplate extends IterativeRobot {
         oceanbluePistons = new Relay(ANCHOR_CHANNEL, Relay.Direction.kBoth);
         skydivePistons = new Relay(COLLECTOR_ANGLE_CHANNEL, Relay.Direction.kBoth);
         dropitlowSensor = new DigitalInput(WINCH_LIMIT_SWITCH_CHANNEL);
+        pushitSensor = new DigitalInput(PRESSURE_SWITCH_CHANNEL); 
         encoder = new Encoder(2, 3);
         //int Evalue = Encoder.getRaw();
-        boolean dropitlowSensor = false;
-        
+          
         //gyroScope = new Gyro(5);
 
         isPS3Joystick = SmartDashboard.getBoolean("usePS3Joystick", true);
@@ -142,6 +146,7 @@ public class RobotTemplate extends IterativeRobot {
         SmartDashboard.putString("Anchor", "UP");
         SmartDashboard.putString("cArm", "RVRSE");
         SmartDashboard.putString("Compressor", "ON");
+        SmartDashboard.putString("LimitSwitch", "NotTouched");
         
        // SmartDashboard.putString("displayAngle",angle);
         //   SmartDashboard.putDouble("Angle", angle);
@@ -206,11 +211,12 @@ public class RobotTemplate extends IterativeRobot {
         checkDrive();
         checkWinch();
         checkCollector();
-        checkCompressor();
+        //checkCompressor();
         checkAnchor();
         checkCollectorAngles();
         checkPancake();
         checkLaunch();
+        checkPressure();
         //  double displayAngle  =  gyro.getAngle();
     }
 
@@ -239,7 +245,7 @@ public class RobotTemplate extends IterativeRobot {
             skydivePistons.set(Relay.Value.kReverse);
             SmartDashboard.putString("cArm", "Retracted");
         }
-        if (operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON)) {
+        if (operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON) || operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON2)) {
             skydivePistons.set(Relay.Value.kForward);
             SmartDashboard.putString("cArm", "Extended");
         }
@@ -250,12 +256,37 @@ public class RobotTemplate extends IterativeRobot {
         if (driverOne.getRawButton(6)) {
             SmartDashboard.putString("Compressor", "ON");
             compressorRelay.set(Relay.Value.kOn);
-        }
+            
+        
+        }     
         if (driverOne.getRawButton(4)) {
             SmartDashboard.putString("Compressor", "OFF");
             compressorRelay.set(Relay.Value.kOff);
         }
+    } 
+    
+    
+    boolean isairBuild() { 
+        return pushitSensor.get();
+        
     }
+    
+    
+    public void checkPressure() { 
+       if (!isairBuild()) {
+            SmartDashboard.putString("Compressor", "ON");
+            compressorRelay.set(Relay.Value.kOn);
+            
+          
+        
+        } 
+       else {
+         SmartDashboard.putString("Compressor", "OFF");
+            compressorRelay.set(Relay.Value.kOff);
+    } 
+            
+   }
+    
 
     
     public void checkAnchor() {
@@ -286,11 +317,13 @@ public class RobotTemplate extends IterativeRobot {
         if (!atBottom()){
             winch1.set(speed);
             winch2.set(speed);
+            SmartDashboard.putString("LimitSwitch", "Touched");
         }
         else
         {
             winch1.set(0.0);
             winch2.set(0.0);
+            SmartDashboard.putString("LimitSwitch", "UnTouched");
         }
     }
     
