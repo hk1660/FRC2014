@@ -26,19 +26,20 @@ import edu.wpi.first.wpilibj.SensorBase;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
- * documentation. If you change the name of this class or the package after
+ * documentation. If you change the0 name of this class or the package after
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
 public class RobotTemplate extends IterativeRobot {
 
     /**
-     * JOYSTICK BUTTONS *
+     * JOYSTICK BUTTONS * 
      */
     //DRIVER JOYSTICK
     final static int ANCHOR_UP_BUTTON = 1;  //1 is triangle
     final static int ANCHOR_DOWN_BUTTON = 3; //3 is x
-
+    final static int GYRO_DRIVING_ON_BUTTON = 9; // 9 is start 
+    final static int GYRO_DRIVING_OFF_BUTTON = 8; // 8 is select
     //OPERATOR JOYSTICK
     final static int RETRACT_LAUNCHER_BUTTON = 7; //7 = L2 
     final static int LAUNCH_BUTTON = 8; //8 = R2
@@ -95,11 +96,12 @@ public class RobotTemplate extends IterativeRobot {
     boolean isPancakeTimerOn = false;
     boolean isPS3Joystick = true;
     boolean isAnchorDown = false; 
+    boolean gyroDriving = false;
     //boolean isdropBoolean = false; 
     DigitalInput pushitSensor; 
     DigitalInput dropitlowSensor;
     Encoder encoder;
-    Gyro gyroScope;
+    Gyro gyro;
     
     /**
      * This function is run when the robot is first started up and should be
@@ -138,8 +140,9 @@ public class RobotTemplate extends IterativeRobot {
         encoder = new Encoder(2, 3);
         //int Evalue = Encoder.getRaw();
           
-        //gyroScope = new Gyro(5);
-
+        gyro = new Gyro(1);
+        gyro.reset();
+        
         isPS3Joystick = SmartDashboard.getBoolean("usePS3Joystick", true);
         SmartDashboard.putString("Collector", "disengaged");
         SmartDashboard.putString("Pancake", "disengaged");
@@ -255,6 +258,7 @@ public class RobotTemplate extends IterativeRobot {
         checkCollectorAngleButtons();
         checkLauncherButtons();
         checkPressure();
+        checkGyroToggleButtons();
     }
 
     public void checkCollectorButtons() {
@@ -352,6 +356,15 @@ public class RobotTemplate extends IterativeRobot {
         }
     }
     
+    void checkGyroToggleButtons (){
+        if (driverOne.getRawButton(GYRO_DRIVING_OFF_BUTTON )){
+            gyroDriving = false;
+        }
+        if (driverOne.getRawButton(GYRO_DRIVING_ON_BUTTON )){
+            gyroDriving = true;
+        }
+    }
+    
     void checkWinchButtons() {
         //SmartDashboard.putNumber("Encoder", encoder.getRate());
         SmartDashboard.putBoolean("WINCH_MOVING", isWinchMoving());
@@ -438,10 +451,16 @@ public class RobotTemplate extends IterativeRobot {
         } else if (rotation < 0) {
             rotation = -1 * ((1 - STARTINGTHRESHOLD) * MathUtils.pow(rotation, 2) + STARTINGTHRESHOLD);
         }
-
-        double gyroAngle = 0;
+        
+        double gyroAngle;
+        if (gyroDriving) {
+           gyroAngle = gyro.getAngle();
+        }else{
+            gyroAngle = 0;
+        }
+         
         //System.out.println("x:" + x + "y:" + y + "rotation:" + rotation);
-        drive.mecanumDrive_Cartesian(x, y, rotation, 0.0);
+        drive.mecanumDrive_Cartesian(x, y, rotation, gyroAngle);
     }
 
     /**
