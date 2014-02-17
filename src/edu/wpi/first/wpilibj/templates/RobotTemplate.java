@@ -100,7 +100,7 @@ public class RobotTemplate extends IterativeRobot {
     DigitalInput dropitlowSensor;
     Encoder encoder;
     Gyro gyroScope;
-
+    double DISTANCE = 10;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -130,6 +130,7 @@ public class RobotTemplate extends IterativeRobot {
         pancakeRelay = new Relay(PANCAKE_CHANNEL, Relay.Direction.kBoth);
         //pancakeRelay.setDirection(Relay.Direction.kForward);
         pancakeTimer = new Timer();
+        autoTimer = new Timer();
         oceanbluePistons = new Relay(ANCHOR_CHANNEL, Relay.Direction.kBoth);
         skydivePistons = new Relay(COLLECTOR_ANGLE_CHANNEL, Relay.Direction.kBoth);
         dropitlowSensor = new DigitalInput(WINCH_LIMIT_SWITCH_CHANNEL);
@@ -151,24 +152,47 @@ public class RobotTemplate extends IterativeRobot {
        // SmartDashboard.putString("displayAngle",angle);
         //   SmartDashboard.putDouble("Angle", angle);
     }
-
+    
+    public double calculateTime()
+    {
+    //endTime = distance / 8;
+    return DISTANCE / 8; 
+    }
+    
+    public void autonomousInit()
+    {
+        autoTimer.reset();
+        autoTimer.start();
+    }
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-        moveForward(0, 3, 1.0);
-        setPancake(3, 5, false);
-        setPancake(5, 7, true);
-        winchDownInAuto(7,9);
-        
+        if (autoTimer.get() >= 10)
+        {
+            autoTimer.stop();
+        }
+        else{
+ 
+            moveForward(0, calculateTime(), 1.0);
+            setPancake(3, 5, false);
+            setPancake(5, 7, true);
+            winchDownInAuto(7,9);
+        }
     }
-
+    
+  /*  public void turnOnTimer()
+    {
+        
+    
+    }
+*/
     public void moveForward (double startTime, double endTime, double speed) { 
        if(autoTimer.get() > startTime && autoTimer.get() < endTime) {
-            drive.drive(speed, 0);
+            drive.mecanumDrive_Cartesian(0, speed, 0, 0);
        }
        else{
-           drive.drive(0, 0);
+           drive.mecanumDrive_Cartesian(0,0, 0, 0); 
        }
      }
     
@@ -437,6 +461,7 @@ public class RobotTemplate extends IterativeRobot {
         }
 
         double gyroAngle = 0;
+        //System.out.println("x:" + x + "y:" + y + "rotation:" + rotation);
         drive.mecanumDrive_Cartesian(x, y, rotation, 0.0);
     }
 
