@@ -73,7 +73,8 @@ public class RobotTemplate extends IterativeRobot {
     final static int PRESSURE_SWITCH_CHANNEL = 5; 
 
     double STARTINGTHRESHOLD = 0.0;
-
+    final static double FULL_SPEED_FEET_PER_SECOND = 8.0;
+        
     Talon frontleft;
     Talon frontright;
     Talon backleft;
@@ -100,7 +101,7 @@ public class RobotTemplate extends IterativeRobot {
     DigitalInput dropitlowSensor;
     Encoder encoder;
     Gyro gyroScope;
-    double DISTANCE = 10;
+    
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -153,10 +154,9 @@ public class RobotTemplate extends IterativeRobot {
         //   SmartDashboard.putDouble("Angle", angle);
     }
     
-    public double calculateTime()
+    public double convertDistanceInFeetToSecondsAtSpeed(double distanceInFeet, double robotSpeed)
     {
-    //endTime = distance / 8;
-    return DISTANCE / 8; 
+        return distanceInFeet / (FULL_SPEED_FEET_PER_SECOND * robotSpeed); 
     }
     
     public void autonomousInit()
@@ -173,8 +173,9 @@ public class RobotTemplate extends IterativeRobot {
             autoTimer.stop();
         }
         else{
- 
-            moveForward(0, calculateTime(), 1.0);
+            double robotSpeed = 1.0;
+            double distanceInFeet = 10;
+            moveForward(0, 0 + convertDistanceInFeetToSecondsAtSpeed(distanceInFeet, robotSpeed), robotSpeed);
             setPancake(3, 5, false);
             setPancake(5, 7, true);
             winchDownInAuto(7,9);
