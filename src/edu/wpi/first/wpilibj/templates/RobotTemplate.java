@@ -162,6 +162,7 @@ public class RobotTemplate extends IterativeRobot {
     {
         autoTimer.reset();
         autoTimer.start();
+        skydivePistons.set(Relay.Value.kReverse);
     }
     /**
      * This function is called periodically during autonomous
@@ -175,10 +176,30 @@ public class RobotTemplate extends IterativeRobot {
             double robotSpeed = 1.0;
             double distanceInFeet = 10;
             moveForward(0, 0 + convertDistanceInFeetToSecondsAtSpeed(distanceInFeet, robotSpeed), robotSpeed);
+            setCollectorDown(2, 3);
             setPancake(3, 5, false);
+            setCollectorUp (5,6) ;
             setPancake(5, 7, true);
             winchDownInAuto(7,9);
         }
+    }
+    
+    public void setCollectorDown (double startTime, double endTime)
+    {
+        if (autoTimer.get() > startTime && autoTimer.get() < endTime)
+        {
+            skydivePistons.set(Relay.Value.kForward);    
+        }
+    
+    }
+    
+     public void setCollectorUp (double startTime, double endTime)
+    {
+        if (autoTimer.get() > startTime && autoTimer.get() < endTime)
+        {
+        skydivePistons.set(Relay.Value.kReverse);    
+        }
+    
     }
     
     public void moveForward (double startTime, double endTime, double speed) { 
