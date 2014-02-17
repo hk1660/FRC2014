@@ -114,7 +114,7 @@ public class RobotTemplate extends IterativeRobot {
             operatorStick = new Joystick(3);
         }
 
-        collector = new Talon(CHANNEL);
+        collector = new Talon(COLLECTOR_CHANNEL);
         frontleft = new Talon(FRONT_LEFT_CHANNEL);
         frontright = new Talon(FRONT_RIGHT_CHANNEL);
         backleft = new Talon(BACK_LEFT_CHANNEL);
@@ -444,7 +444,6 @@ public class RobotTemplate extends IterativeRobot {
         //Set Rotation Angle based on Joystick Type
         if (isPS3Joystick) {
             rotation = driverOne.getRawAxis(3);
-            rotation = rotation * -1;
         } else {
             rotation = driverTwo.getRawAxis(1);
             rotation = rotation * -1;
