@@ -40,9 +40,8 @@ public class RobotTemplate extends IterativeRobot {
     final static int ANCHOR_DOWN_BUTTON = 3; //3 is x
 
     //OPERATOR JOYSTICK
-    final static int PANCAKE_BUTTON = 7; //7 = L2 
+    final static int RETRACT_LAUNCHER_BUTTON = 7; //7 = L2 
     final static int LAUNCH_BUTTON = 8; //8 = R2
-    final static int UNLAUNCH_BUTTON = 9; //9 = SELECT
     final static int WINCH_BUTTON = 6; //6 is R1
     final static int COLLECTOR_DOWN_BUTTON = 4; //4 = SQUARE
     final static int COLLECTOR_DOWN_BUTTON2 = 10; //=10 = start
@@ -182,12 +181,6 @@ public class RobotTemplate extends IterativeRobot {
         }
     }
     
-  /*  public void turnOnTimer()
-    {
-        
-    
-    }
-*/
     public void moveForward (double startTime, double endTime, double speed) { 
        if(autoTimer.get() > startTime && autoTimer.get() < endTime) {
             drive.mecanumDrive_Cartesian(0, speed, 0, 0);
@@ -233,19 +226,17 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        checkDrive();
-        checkWinch();
-        checkCollector();
+        checkDriveJoystick();
+        checkWinchButtons();
+        checkCollectorButtons();
         //checkCompressor();
-        checkAnchor();
-        checkCollectorAngles();
-        checkPancake();
-        checkLaunch();
+        checkAnchorButtons();
+        checkCollectorAngleButtons();
+        checkLauncherButtons();
         checkPressure();
-        //  double displayAngle  =  gyro.getAngle();
     }
 
-    public void checkCollector() {
+    public void checkCollectorButtons() {
         if (operatorStick.getRawButton(COLLECTOR_BUTTON)) {
             SmartDashboard.putString("Collector", "FWD");
             collector.set(1.0);
@@ -258,14 +249,8 @@ public class RobotTemplate extends IterativeRobot {
         }
 
     }
-    /*public void compressorRelaySwitchOn() {
-     compressorRelay.set(Relay.Value.kOn);
-     //System.out.println("Compressor Relay Value Now: " + compressorRelay.get().value);
 
-     }
-     */
-
-    public void checkCollectorAngles() {
+    public void checkCollectorAngleButtons() {
         if (operatorStick.getRawButton(COLLECTOR_UP_BUTTON)) {
             skydivePistons.set(Relay.Value.kReverse);
             SmartDashboard.putString("cArm", "Retracted");
@@ -277,12 +262,10 @@ public class RobotTemplate extends IterativeRobot {
 
     }
 
-    public void checkCompressor() {
+    public void checkCompressorButtonOnDriverStick() {
         if (driverOne.getRawButton(6)) {
             SmartDashboard.putString("Compressor", "ON");
             compressorRelay.set(Relay.Value.kOn);
-            
-        
         }     
         if (driverOne.getRawButton(4)) {
             SmartDashboard.putString("Compressor", "OFF");
@@ -301,20 +284,16 @@ public class RobotTemplate extends IterativeRobot {
        if (!isairBuild()) {
             SmartDashboard.putString("Compressor", "ON");
             compressorRelay.set(Relay.Value.kOn);
-            
-          
-        
         } 
        else {
          SmartDashboard.putString("Compressor", "OFF");
             compressorRelay.set(Relay.Value.kOff);
-    } 
-            
+    }      
    }
     
 
     
-    public void checkAnchor() {
+    public void checkAnchorButtons() {
         if (driverOne.getRawButton(ANCHOR_DOWN_BUTTON)) {
             isAnchorDown = true;
             SmartDashboard.putString("Anchor", "DOWN");
@@ -352,7 +331,7 @@ public class RobotTemplate extends IterativeRobot {
         }
     }
     
-    void checkWinch() {
+    void checkWinchButtons() {
         //SmartDashboard.putNumber("Encoder", encoder.getRate());
         SmartDashboard.putBoolean("WINCH_MOVING", isWinchMoving());
         if (operatorStick.getRawButton(WINCH_BUTTON)) {
@@ -364,39 +343,18 @@ public class RobotTemplate extends IterativeRobot {
         }
     }
 
-    public void checkLaunch()
+    public void checkLauncherButtons()
     {
         if (operatorStick.getRawButton(LAUNCH_BUTTON)) {
             disengagePancake();
         }
-        if (operatorStick.getRawButton(UNLAUNCH_BUTTON)) {
+        if (operatorStick.getRawButton(RETRACT_LAUNCHER_BUTTON)) {
             engagePancake();
         }
     }    
     
     
-    
-    public void checkPancake() {
-        if (operatorStick.getRawButton(PANCAKE_BUTTON) ) {  //&& isPancakeTimerOn == false
-           // pancakeTimer.start();
-           // isPancakeTimerOn = true;
-            engagePancake();
-            //SmartDashboard.putNumber("pancakeTimer", pancakeTimer.get());
-            SmartDashboard.putString("Pancake", "engaged");
-        }
-        
-        /*
-        // after 2 secs
-        if (pancakeTimer.get() >= 2) {
-            disengagePancake();
-            pancakeTimer.stop();
-            pancakeTimer.reset();
-            isPancakeTimerOn = false;
-        }
-        */
-    }
-
-    private void checkDrive() {
+    private void checkDriveJoystick() {
         if(isAnchorDown == true){
             drive.drive(0.0, 0.0);
             return;
