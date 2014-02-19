@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SensorBase;
-
+import edu.wpi.first.wpilibj.AnalogModule;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.SensorBase;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class RobotTemplate extends IterativeRobot {
+public class RobotTemplate extends IterativeRobot{
 
     /**
      * JOYSTICK BUTTONS * 
@@ -38,15 +38,14 @@ public class RobotTemplate extends IterativeRobot {
     //DRIVER JOYSTICK
     final static int ANCHOR_UP_BUTTON = 1;  //1 is triangle
     final static int ANCHOR_DOWN_BUTTON = 3; //3 is x
-    final static int GYRO_DRIVING_ON_BUTTON = 9; // 9 is start 
-    final static int GYRO_DRIVING_OFF_BUTTON = 8; // 8 is select
+    final static int GYRO_DRIVING_ON_BUTTON = 10; // 10 is start 
+    final static int GYRO_DRIVING_OFF_BUTTON = 9; // 9 is select
     //OPERATOR JOYSTICK
-    final static int RETRACT_LAUNCHER_BUTTON = 7; //7 = L2 
-    final static int LAUNCH_BUTTON = 8; //8 = R2
+    final static int SHOOT_BUTTON = 7; //7 = L2 
+    final static int LOCK_WINCH_BUTTON = 8; //8 = R2
     final static int WINCH_BUTTON = 6; //6 is R1
-    final static int COLLECTOR_DOWN_BUTTON = 4; //4 = SQUARE
-    final static int COLLECTOR_DOWN_BUTTON2 = 10; //=10 = start
-    final static int COLLECTOR_UP_BUTTON = 2; //2 = CIRCLE
+    final static int COLLECTOR_UP_BUTTON = 4; //4 = SQUARE
+    final static int COLLECTOR_DOWN_BUTTON = 2; //2 = CIRCLE
     final static int COLLECTOR_BUTTON = 1; //1 is triangle
     final static int COLLECTOR_BUTTON_REVERSE = 3; //3 is x
 
@@ -72,8 +71,9 @@ public class RobotTemplate extends IterativeRobot {
     final static int WINCH_LIMIT_SWITCH_CHANNEL = 4;
     final static int PRESSURE_SWITCH_CHANNEL = 5; 
 
-    double STARTINGTHRESHOLD = 0.0;
-    final static double FULL_SPEED_FEET_PER_SECOND = 8.0;
+    double STARTINGTHRESHOLD = 0.1;
+    double MINJOYSTICKVALUE = 0.1;
+    final static double FULL_SPEED_FEET_PER_SECOND = 7.2;
         
     Talon frontleft;
     Talon frontright;
@@ -101,11 +101,12 @@ public class RobotTemplate extends IterativeRobot {
     DigitalInput pushitSensor; 
     DigitalInput dropitlowSensor;
     Encoder encoder;
-    Gyro gyro;
-    
+    //Gyro gyro;
+    //AnalogModule VoltageSensor = new AnalogModule(1);
     /**
-     * This function is run when the robot is first started up and should be
-     * used for any initialization code.
+     * This function is run when the robot is first started up and should be9iuuyyhn vfr4aaS
+     * S3W\S
+     SSS9ed for any initialization code.
      */
     public void robotInit() {
         driverOne = new Joystick(1);
@@ -115,7 +116,7 @@ public class RobotTemplate extends IterativeRobot {
             driverTwo = new Joystick(2);
             operatorStick = new Joystick(3);
         }
-
+       
         collector = new Talon(COLLECTOR_CHANNEL);
         frontleft = new Talon(FRONT_LEFT_CHANNEL);
         frontright = new Talon(FRONT_RIGHT_CHANNEL);
@@ -124,24 +125,25 @@ public class RobotTemplate extends IterativeRobot {
         winch1 = new Talon(WINCH_1_CHANNEL);
         winch2 = new Talon(WINCH_2_CHANNEL);
         drive = new RobotDrive(frontleft, backleft, frontright, backright);
-        compressorRelay = new Relay(COMPRESSOR_RELAY_CHANNEL, Relay.Direction.kForward);
-        compressorRelay.set(Relay.Value.kOn);
+        compressorRelay = new Relay(COMPRESSOR_RELAY_CHANNEL);
+        compressorRelay.set(Relay.Value.kForward);
         //compressorRelaySwitchOn();
         //compressor = new Compressor(5,1);
         //compressor.start();
-        pancakeRelay = new Relay(PANCAKE_CHANNEL, Relay.Direction.kBoth);
-        //pancakeRelay.setDirection(Relay.Direction.kForward);
+        pancakeRelay = new Relay(PANCAKE_CHANNEL);
+        pancakeRelay.set(Relay.Value.kReverse);
         pancakeTimer = new Timer();
         autoTimer = new Timer();
-        oceanbluePistons = new Relay(ANCHOR_CHANNEL, Relay.Direction.kBoth);
-        skydivePistons = new Relay(COLLECTOR_ANGLE_CHANNEL, Relay.Direction.kBoth);
+        oceanbluePistons = new Relay(ANCHOR_CHANNEL);
+        skydivePistons = new Relay(COLLECTOR_ANGLE_CHANNEL);
+        skydivePistons.set(Relay.Value.kForward);
         dropitlowSensor = new DigitalInput(WINCH_LIMIT_SWITCH_CHANNEL);
         pushitSensor = new DigitalInput(PRESSURE_SWITCH_CHANNEL); 
         encoder = new Encoder(2, 3);
         //int Evalue = Encoder.getRaw();
-          
-        gyro = new Gyro(1);
-        gyro.reset();
+      
+        //gyro = new Gyro(1);
+        //gyro.reset();
         
         isPS3Joystick = SmartDashboard.getBoolean("usePS3Joystick", true);
         SmartDashboard.putString("Collector", "disengaged");
@@ -151,6 +153,10 @@ public class RobotTemplate extends IterativeRobot {
         SmartDashboard.putString("cArm", "RVRSE");
         SmartDashboard.putString("Compressor", "ON");
         SmartDashboard.putString("LimitSwitch", "NotTouched");
+        
+        oceanbluePistons.set(Relay.Value.kForward);
+        pancakeRelay.set(Relay.Value.kForward); 
+        skydivePistons.set(Relay.Value.kForward);
         
        // SmartDashboard.putString("displayAngle",angle);
         //   SmartDashboard.putDouble("Angle", angle);
@@ -165,7 +171,7 @@ public class RobotTemplate extends IterativeRobot {
     {
         autoTimer.reset();
         autoTimer.start();
-        skydivePistons.set(Relay.Value.kReverse);
+        skydivePistons.set(Relay.Value.kForward);
     }
     /**
      * This function is called periodically during autonomous
@@ -184,23 +190,26 @@ public class RobotTemplate extends IterativeRobot {
             setCollectorUp (5,6) ;
             setPancake(5, 7, true);
             winchDownInAuto(7,9);
+            System.out.println(autoTimer.get());
         }
     }
     
-    public void setCollectorDown (double startTime, double endTime)
+    public void setCollectorUp (double startTime, double endTime)
     {
         if (autoTimer.get() > startTime && autoTimer.get() < endTime)
         {
-            skydivePistons.set(Relay.Value.kForward);    
+            skydivePistons.set(Relay.Value.kForward); 
+            System.out.println("setting collector up");
         }
     
     }
     
-     public void setCollectorUp (double startTime, double endTime)
+     public void setCollectorDown (double startTime, double endTime)
     {
         if (autoTimer.get() > startTime && autoTimer.get() < endTime)
         {
-        skydivePistons.set(Relay.Value.kReverse);    
+        skydivePistons.set(Relay.Value.kReverse);   
+        System.out.println("setting collector down");
         }
     
     }
@@ -214,24 +223,26 @@ public class RobotTemplate extends IterativeRobot {
        }
      }
     
-    void setPancake(double startTime, double endTime, boolean engaged){
+    void setPancake(double startTime, double endTime, boolean locked){
         if(autoTimer.get() > startTime && autoTimer.get() < endTime){
-            if(engaged){
-                engagePancake();
+            if(locked){
+                lockPancake();
+                System.out.println("locking pancacke");
             }else{
-                disengagePancake();
+                unlockPancake();
+                System.out.println("unlocking pancacke");
             }
         }
     }
     
-    public void disengagePancake()
+    public void lockPancake()
     {
-        SmartDashboard.putString("Pancake", "disengaged");
+        SmartDashboard.putString("Pancake", "locked");
         pancakeRelay.set(Relay.Value.kReverse);
     }
-    public void engagePancake()
+    public void unlockPancake()
     {
-         SmartDashboard.putString("Pancake", "engaged");
+         SmartDashboard.putString("Pancake", "unlocked");
          pancakeRelay.set(Relay.Value.kForward);
     }
     public void winchDownInAuto(double startTime, double endTime)
@@ -250,14 +261,16 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        checkDriveJoystick();
+       for(int i=0; i<10; i++){
+           checkDriveJoystick();
+       }
         checkWinchButtons();
         checkCollectorButtons();
-        //checkCompressor();
+        checkCompressorButtonOnDriverStick();
         checkAnchorButtons();
         checkCollectorAngleButtons();
         checkLauncherButtons();
-        checkPressure();
+        //checkPressure();
         checkGyroToggleButtons();
     }
 
@@ -276,11 +289,11 @@ public class RobotTemplate extends IterativeRobot {
     }
 
     public void checkCollectorAngleButtons() {
-        if (operatorStick.getRawButton(COLLECTOR_UP_BUTTON)) {
+        if (operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON)) {
             skydivePistons.set(Relay.Value.kReverse);
             SmartDashboard.putString("cArm", "Retracted");
         }
-        if (operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON) || operatorStick.getRawButton(COLLECTOR_DOWN_BUTTON2)) {
+        if (operatorStick.getRawButton(COLLECTOR_UP_BUTTON)) {
             skydivePistons.set(Relay.Value.kForward);
             SmartDashboard.putString("cArm", "Extended");
         }
@@ -288,27 +301,27 @@ public class RobotTemplate extends IterativeRobot {
     }
 
     public void checkCompressorButtonOnDriverStick() {
-        if (driverOne.getRawButton(6)) {
+        if (operatorStick.getRawButton(9)) {
             SmartDashboard.putString("Compressor", "ON");
-            compressorRelay.set(Relay.Value.kOn);
+            compressorRelay.set(Relay.Value.kForward);
         }     
-        if (driverOne.getRawButton(4)) {
+        if (operatorStick.getRawButton(10)) {
             SmartDashboard.putString("Compressor", "OFF");
             compressorRelay.set(Relay.Value.kOff);
         }
     } 
     
     
-    boolean isairBuild() { 
+    boolean isCompressorAtMaxPressure() { 
         return pushitSensor.get();
         
     }
     
     
     public void checkPressure() { 
-       if (!isairBuild()) {
+       if (!isCompressorAtMaxPressure()) {
             SmartDashboard.putString("Compressor", "ON");
-            compressorRelay.set(Relay.Value.kOn);
+            compressorRelay.set(Relay.Value.kForward);
         } 
        else {
          SmartDashboard.putString("Compressor", "OFF");
@@ -343,7 +356,7 @@ public class RobotTemplate extends IterativeRobot {
     
     void moveWinch(double speed)
     {
-        if (!atBottom()){
+        if (false){ //should be !atBottom() instead of false
             winch1.set(speed);
             winch2.set(speed);
             SmartDashboard.putString("LimitSwitch", "Touched");
@@ -379,11 +392,11 @@ public class RobotTemplate extends IterativeRobot {
 
     public void checkLauncherButtons()
     {
-        if (operatorStick.getRawButton(LAUNCH_BUTTON)) {
-            disengagePancake();
+        if (operatorStick.getRawButton(LOCK_WINCH_BUTTON)) {
+            lockPancake();
         }
-        if (operatorStick.getRawButton(RETRACT_LAUNCHER_BUTTON)) {
-            engagePancake();
+        if (operatorStick.getRawButton(SHOOT_BUTTON)) {
+            unlockPancake();
         }
     }    
     
@@ -403,14 +416,14 @@ public class RobotTemplate extends IterativeRobot {
             x = driverOne.getRawAxis(1);
             x = x * -1;
         }
-        if (x < 0.01 && x > -0.01) {
+        if (x < MINJOYSTICKVALUE && x > -1*MINJOYSTICKVALUE) {
             x = 0;
         }
 
         if (x > 0) {
-            x = (1 - STARTINGTHRESHOLD) * MathUtils.pow(x, 2) + STARTINGTHRESHOLD;
+            x = (1 - STARTINGTHRESHOLD) * MathUtils.pow(x, 4) + STARTINGTHRESHOLD;
         } else if (x < 0) {
-            x = -1 * ((1 - STARTINGTHRESHOLD) * MathUtils.pow(x, 2) + STARTINGTHRESHOLD);
+            x = -1 * ((1 - STARTINGTHRESHOLD) * MathUtils.pow(x, 4) + STARTINGTHRESHOLD);
         }
 
         //Set Y-motion (STRAFE) based on Joystick Type
@@ -423,26 +436,26 @@ public class RobotTemplate extends IterativeRobot {
             y = driverOne.getRawAxis(2);
         }
 
-        if (y < 0.01 && y > -0.01) {
+        if (y < MINJOYSTICKVALUE && y > -1 * MINJOYSTICKVALUE) {
             y = 0;
         }
         if (y > 0) {
-            y = (1 - STARTINGTHRESHOLD) * MathUtils.pow(y, 2) + STARTINGTHRESHOLD;
+            y = (1 - STARTINGTHRESHOLD) * MathUtils.pow(y, 4) + STARTINGTHRESHOLD;
         } else if (y < 0) {
-            y = -1 * ((1 - STARTINGTHRESHOLD) * MathUtils.pow(y, 2) + STARTINGTHRESHOLD);
+            y = -1 * ((1 - STARTINGTHRESHOLD) * MathUtils.pow(y, 4) + STARTINGTHRESHOLD);
         }
 
         double rotation = 0;
 
         //Set Rotation Angle based on Joystick Type
         if (isPS3Joystick) {
-            rotation = driverOne.getRawAxis(3);
+            rotation = driverOne.getRawAxis(3) * -1;
         } else {
             rotation = driverTwo.getRawAxis(1);
             rotation = rotation * -1;
         }
 
-        if (rotation < 0.01 && rotation > -0.01) {
+        if (rotation < MINJOYSTICKVALUE && rotation > -1 * MINJOYSTICKVALUE) {
             rotation = 0;
         }
 
@@ -453,11 +466,11 @@ public class RobotTemplate extends IterativeRobot {
         }
         
         double gyroAngle;
-        if (gyroDriving) {
-           gyroAngle = gyro.getAngle();
-        }else{
+        //if (gyroDriving) {
+        //   gyroAngle = gyro.getAngle();
+        //}else{
             gyroAngle = 0;
-        }
+        //}
          
         //System.out.println("x:" + x + "y:" + y + "rotation:" + rotation);
         drive.mecanumDrive_Cartesian(x, y, rotation, gyroAngle);
